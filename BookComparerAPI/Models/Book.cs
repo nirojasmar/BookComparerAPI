@@ -10,9 +10,7 @@ namespace BookComparerAPI.Models
         public string? Author { get; set; }
         public string? Editor { get; set; }
         public string? Language { get; set; }
-        public string? CategoryId { get; set; }
         public string? Format { get; set; }
-        public Category Category { get; set; }
         public string? Url { get; set; }
         public string? UrlImage { get; set; }
 

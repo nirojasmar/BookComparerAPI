@@ -22,15 +22,22 @@ namespace BookComparerAPI.Scraper
 
         public static List<Book> GetAmazonBook()
         {
-            var BookName = new List<Book>();
-            var html = GetHtml("https://www.amazon.com/s?i=stripbooks&bbn=1000&rh=n%3A283155%2Cn%3A25&dc&fs=true&language=es&qid=1645550499&rnid=1000&ref=sr_nr_n_7");
-            //Verification Pending
-            var links = html.CssSelect("div.a-scetion.a-spacing-none");
+            var bookList = new List<Book>();
+            var html = GetHtml("https://www.amazon.com/s?bbn=283155&rh=n%3A283155%2Cp_n_feature_browse-bin%3A2656022011&dc&language=es&qid=1646073525&rnid=618072011&ref=lp_1000_nr_p_n_feature_browse-bin_7");
+            // TODO: Get Results for all pages.
+            var links = html.CssSelect("div.a-section.a-spacing-small");
             foreach (var link in links)
             {
                 try
                 {
                     Book book = new Book();
+                    var mainURL = link.CssSelect("a.a-link-normal"); //Book URL and ISBN
+                    foreach (var link1 in mainURL)
+                    {
+                        var uri = link1.Attributes["href"].Value;
+                        book.Url = uri;
+                        //TODO: Extract ISBN from URL
+                    }
                     var mainName = link.CssSelect("span.a-size-medium"); //Book Name
                     foreach (var link1 in mainName)
                     {
@@ -40,13 +47,34 @@ namespace BookComparerAPI.Scraper
                         }
                     }
 
-                    var mainPrice = link.CssSelect("span.a-price-whole"); //Book Price
-                    foreach (var link1 in mainName)
+                    var mainAuthor = link.CssSelect("a.a-size-base.a-link-normal"); //Book Author
+                    foreach (var link1 in mainAuthor)
                     {
                         if(!link1.InnerHtml.Contains("class="))
                         {
-                            book.AmazonPrice = Convert.ToDecimal(link1.InnerHtml);    
+                            book.Author = link1.InnerHtml;    
                         }
+                    }
+                    var mainFormat = link.CssSelect("a.a-size-base.a-link-normal"); //Book Format
+                    foreach (var link1 in mainFormat)
+                    {
+                        if (!link1.InnerHtml.Contains("class="))
+                        {
+                            book.Format = link1.InnerHtml;
+                        }
+                    }
+                    var mainPrice = link.CssSelect("span.a-price-whole"); //Book Price
+                    foreach (var link1 in mainFormat)
+                    {
+                        if (!link1.InnerHtml.Contains("class="))
+                        {
+                            book.AmazonPrice = Convert.ToDecimal(link1.InnerHtml);
+                        }
+                    }
+
+                    if (book.Name != null && book.Author != null && book.AmazonPrice != 0 && book.Format != null && book.Url != null)
+                    {
+                        bookList.Add(book);
                     }
                 }
                 catch (Exception)
@@ -55,7 +83,7 @@ namespace BookComparerAPI.Scraper
                     throw;
                 }
             }
-            return BookName;
+            return bookList;
         }
     }
 }
