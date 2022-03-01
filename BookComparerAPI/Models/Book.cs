@@ -6,18 +6,16 @@ namespace BookComparerAPI.Models
     {
         [Key]
         public int ISBN { get; set; }
+        [Required]
         public string? Name { get; set; }
+        [Required]
         public string? Author { get; set; }
         public string? Editor { get; set; }
         public string? Language { get; set; }
         public string? Format { get; set; }
         public string? Url { get; set; }
         public string? UrlImage { get; set; }
+        public List <PriceDate>? PriceDates { get; set;}
 
-        [DataType(DataType.Currency)]
-        public decimal AmazonPrice { get; set; }
-
-        [DataType(DataType.Currency)]
-        public decimal BLPrice { get; set; }
     }
 }

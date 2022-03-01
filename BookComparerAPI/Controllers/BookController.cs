@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BookComparerAPI.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using BookComparerAPI.Scraping;
 
 namespace BookComparerAPI.Controllers
 {
@@ -15,15 +17,15 @@ namespace BookComparerAPI.Controllers
         }
         [HttpGet(Name = "GetBookList")]
         // GET: BookController
-        public ActionResult Index()
+        public List<Book> Index()
         {
-            return View();
+            return Scraper.GetAmazonBook();
         }
 
         // GET: BookController/Details/12345
-        public ActionResult Details(int ISBN)
+        /*public ActionResult Details(int ISBN)
         {
             return View();
-        }
+        }*/
     }
 }

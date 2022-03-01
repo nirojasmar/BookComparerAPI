@@ -4,7 +4,7 @@ using HtmlAgilityPack;
 using ScrapySharp.Extensions;
 using ScrapySharp.Network;
 
-namespace BookComparerAPI.Scraper
+namespace BookComparerAPI.Scraping
 {
     public class Scraper
     {
@@ -50,7 +50,7 @@ namespace BookComparerAPI.Scraper
                     var mainAuthor = link.CssSelect("a.a-size-base.a-link-normal"); //Book Author
                     foreach (var link1 in mainAuthor)
                     {
-                        if(!link1.InnerHtml.Contains("class="))
+                        if(!link1.InnerHtml.Contains("class=")) //TODO: Change if requirement, book.author overridding with format
                         {
                             book.Author = link1.InnerHtml;    
                         }
@@ -64,15 +64,16 @@ namespace BookComparerAPI.Scraper
                         }
                     }
                     var mainPrice = link.CssSelect("span.a-price-whole"); //Book Price
-                    foreach (var link1 in mainFormat)
+                    foreach (var link1 in mainPrice)
                     {
                         if (!link1.InnerHtml.Contains("class="))
                         {
-                            book.AmazonPrice = Convert.ToDecimal(link1.InnerHtml);
+                            book.PriceDates.Add(new PriceDate(Convert.ToDouble(link1.InnerText), "Amazon"));
+                            break;
                         }
                     }
 
-                    if (book.Name != null && book.Author != null && book.AmazonPrice != 0 && book.Format != null && book.Url != null)
+                    if (book.Name != null && book.Author != null && book.Format != null && book.Url != null)
                     {
                         bookList.Add(book);
                     }
