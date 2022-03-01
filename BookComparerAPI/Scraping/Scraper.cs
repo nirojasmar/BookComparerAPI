@@ -36,6 +36,7 @@ namespace BookComparerAPI.Scraping
                     {
                         var uri = link1.Attributes["href"].Value;
                         book.Url = uri;
+                        break;
                         //TODO: Extract ISBN from URL
                     }
                     var mainName = link.CssSelect("span.a-size-medium"); //Book Name
@@ -52,7 +53,8 @@ namespace BookComparerAPI.Scraping
                     {
                         if(!link1.InnerHtml.Contains("class=")) //TODO: Change if requirement, book.author overridding with format
                         {
-                            book.Author = link1.InnerHtml;    
+                            book.Author = link1.InnerHtml;
+                            break;
                         }
                     }
                     var mainFormat = link.CssSelect("a.a-size-base.a-link-normal"); //Book Format
@@ -80,7 +82,6 @@ namespace BookComparerAPI.Scraping
                 }
                 catch (Exception)
                 {
-
                     throw;
                 }
             }

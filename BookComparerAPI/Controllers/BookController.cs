@@ -15,6 +15,7 @@ namespace BookComparerAPI.Controllers
         {
             _logger = logger;
         }
+
         [HttpGet(Name = "GetBookList")]
         // GET: BookController
         public List<Book> Index()
@@ -22,10 +23,10 @@ namespace BookComparerAPI.Controllers
             return Scraper.GetAmazonBook();
         }
 
-        // GET: BookController/Details/12345
-        /*public ActionResult Details(int ISBN)
+        // GET: BookController/Search/12345
+        public Book Search(int ISBN)
         {
-            return View();
-        }*/
+            return null; //TODO: Not yet implemented
+        }
     }
 }
