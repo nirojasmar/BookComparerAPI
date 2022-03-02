@@ -31,6 +31,8 @@ namespace BookComparerAPI.Scraping
                 try
                 {
                     Book book = new Book();
+                    List<PriceDate> priceDates = new List<PriceDate>();
+                    book.PriceDates = priceDates;
                     var mainURL = link.CssSelect("a.a-link-normal"); //Book URL and ISBN
                     foreach (var link1 in mainURL)
                     {
@@ -65,12 +67,13 @@ namespace BookComparerAPI.Scraping
                             book.Format = link1.InnerHtml;
                         }
                     }
-                    var mainPrice = link.CssSelect("span.a-price-whole"); //Book Price
+                    var mainPrice = link.CssSelect("span.a-offscreen"); //Book Price
                     foreach (var link1 in mainPrice)
                     {
                         if (!link1.InnerHtml.Contains("class="))
                         {
-                            book.PriceDates.Add(new PriceDate(Convert.ToDouble(link1.InnerText), "Amazon"));
+                            PriceDate priceDate = new PriceDate(Convert.ToDouble(link1.InnerHtml.Replace("US$", "").Replace(',', '.')), "Amazon");
+                            book.PriceDates.Add(priceDate);
                             break;
                         }
                     }

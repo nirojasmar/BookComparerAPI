@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BookComparerAPI.Scraping;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace BookComparerAPI.Controllers
 {
@@ -16,17 +17,27 @@ namespace BookComparerAPI.Controllers
             _logger = logger;
         }
 
-        [HttpGet(Name = "GetBookList")]
+        [HttpGet("~/getBookList")] 
         // GET: BookController
         public List<Book> Index()
         {
             return Scraper.GetAmazonBook();
         }
 
+
+        [HttpGet("~/getPriceList")]
+        //GET: PriceList
+        public List<PriceDate> IndexPrice(int id)
+        {
+            return Scraper.GetAmazonBook()[id].PriceDates;
+        }
+
         // GET: BookController/Search/12345
+        /*
+        [HttpGet("~/getSearchResult")]
         public Book Search(int ISBN)
         {
-            return null; //TODO: Not yet implemented
-        }
+            return null; //TODO: Not yet implemented: DB Pending
+        }*/
     }
 }
