@@ -7,11 +7,12 @@ namespace BookComparerAPI.Models
         [Required]
         public DateTime date { get; set; }
         [Required]
-        public double price { get; set; }
+        [DataType(DataType.Currency)]
+        public decimal price { get; set; }
         [Required]
         public string store { get; set; }
 
-        public PriceDate(double price, string store)
+        public PriceDate(decimal price, string store)
         {
             this.date = DateTime.Now;
             this.price = price;

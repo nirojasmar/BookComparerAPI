@@ -72,7 +72,7 @@ namespace BookComparerAPI.Scraping
                     {
                         if (!link1.InnerHtml.Contains("class="))
                         {
-                            PriceDate priceDate = new PriceDate(Convert.ToDouble(link1.InnerHtml.Replace("US$", "").Replace(',', '.')), "Amazon");
+                            PriceDate priceDate = new PriceDate(Convert.ToDecimal(link1.InnerHtml.Replace("US$", "").Replace(',', '.')), "Amazon");
                             book.PriceDates.Add(priceDate);
                             break;
                         }
