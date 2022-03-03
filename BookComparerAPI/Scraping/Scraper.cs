@@ -38,6 +38,11 @@ namespace BookComparerAPI.Scraping
                     {
                         var uri = link1.Attributes["href"].Value;
                         book.Url = uri;
+                        /*
+                         * Examples:
+                         *"/-/es/Colleen-Hoover/dp/1501110349/ref=sr_1_15?qid=1646327166&amp;refinements=p_n_feature_browse-bin%3A2656022011&amp;rnid=618072011&amp;s=books&amp;sr=1-15"
+                         *"/-/es/Gary-Chapman/dp/080241270X/ref=sr_1_16?qid=1646327166&amp;refinements=p_n_feature_browse-bin%3A2656022011&amp;rnid=618072011&amp;s=books&amp;sr=1-16"
+                         */
                         break;
                         //TODO: Extract ISBN from URL
                     }
@@ -50,21 +55,22 @@ namespace BookComparerAPI.Scraping
                         }
                     }
 
-                    var mainAuthor = link.CssSelect("a.a-size-base.a-link-normal"); //Book Author
+                    var mainAuthor = link.CssSelect("a.a-size-base"); //Book Author
                     foreach (var link1 in mainAuthor)
                     {
-                        if(!link1.InnerHtml.Contains("class=")) //TODO: Change if requirement, book.author overridding with format
+                        if(!link1.InnerHtml.Contains("class="))
                         {
                             book.Author = link1.InnerHtml;
                             break;
                         }
                     }
-                    var mainFormat = link.CssSelect("a.a-size-base.a-link-normal"); //Book Format
+                    var mainFormat = link.CssSelect("a.a-size-base.a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-bold"); //Book Format
                     foreach (var link1 in mainFormat)
                     {
                         if (!link1.InnerHtml.Contains("class="))
                         {
                             book.Format = link1.InnerHtml;
+                            break;
                         }
                     }
                     var mainPrice = link.CssSelect("span.a-offscreen"); //Book Price

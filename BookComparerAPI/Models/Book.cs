@@ -14,7 +14,6 @@ namespace BookComparerAPI.Models
         public string? Language { get; set; }
         public string? Format { get; set; }
         public string? Url { get; set; }
-        public string? UrlImage { get; set; } //TODO: Remove
         public List <PriceDate> PriceDates { get; set;}
 
     }
