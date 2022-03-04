@@ -38,13 +38,16 @@ namespace BookComparerAPI.Scraping
                     {
                         var uri = link1.Attributes["href"].Value;
                         book.Url = uri;
+                        var substring = uri.Substring(uri.IndexOf("dp/") + 3);
+                        book.ISBN = Convert.ToInt32("978" + substring.Remove(9).Replace('X','0'));
                         /*
                          * Examples:
                          *"/-/es/Colleen-Hoover/dp/1501110349/ref=sr_1_15?qid=1646327166&amp;refinements=p_n_feature_browse-bin%3A2656022011&amp;rnid=618072011&amp;s=books&amp;sr=1-15"
+                         *To ISBN --> 9781501110349
                          *"/-/es/Gary-Chapman/dp/080241270X/ref=sr_1_16?qid=1646327166&amp;refinements=p_n_feature_browse-bin%3A2656022011&amp;rnid=618072011&amp;s=books&amp;sr=1-16"
+                         *To ISBN --> 9780802412700
                          */
                         break;
-                        //TODO: Extract ISBN from URL
                     }
                     var mainName = link.CssSelect("span.a-size-medium"); //Book Name
                     foreach (var link1 in mainName)
