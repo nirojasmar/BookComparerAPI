@@ -5,7 +5,7 @@ namespace BookComparerAPI.Models
     public class Book
     {
         [Key]
-        public int ISBN { get; set; }
+        public double ISBN { get; set; }
         [Required]
         public string? Name { get; set; }
         [Required]

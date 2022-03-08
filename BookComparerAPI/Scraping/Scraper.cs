@@ -23,78 +23,82 @@ namespace BookComparerAPI.Scraping
         public static List<Book> GetAmazonBook()
         {
             var bookList = new List<Book>();
-            var html = GetHtml("https://www.amazon.com/s?bbn=283155&rh=n%3A283155%2Cp_n_feature_browse-bin%3A2656022011&dc&language=es&qid=1646073525&rnid=618072011&ref=lp_1000_nr_p_n_feature_browse-bin_7");
-            // TODO: Get Results for all pages.
-            var links = html.CssSelect("div.a-section.a-spacing-small");
-            foreach (var link in links)
+            for (int i = 1; i <= 75; i++)
             {
-                try
+                var html = GetHtml("https://www.amazon.com/s?i=stripbooks&bbn=283155&rh=n%3A283155%2Cp_n_feature_browse-bin%3A2656022011&dc&page=" + i + "&language=es&qid=1646690447&rnid=618072011&ref=sr_pg_"+i);
+                // Example URL:
+                // https://www.amazon.com/s?i=stripbooks&bbn=283155&rh=n%3A283155%2Cp_n_feature_browse-bin%3A2656022011&dc&page=2&language=es&qid=1646710477&rnid=618072011&ref=sr_pg_2
+                var links = html.CssSelect("div.a-section.a-spacing-small");
+                foreach (var link in links)
                 {
-                    Book book = new Book();
-                    List<PriceDate> priceDates = new List<PriceDate>();
-                    book.PriceDates = priceDates;
-                    var mainURL = link.CssSelect("a.a-link-normal"); //Book URL and ISBN
-                    foreach (var link1 in mainURL)
+                    try
                     {
-                        var uri = link1.Attributes["href"].Value;
-                        book.Url = uri;
-                        var substring = uri.Substring(uri.IndexOf("dp/") + 3);
-                        book.ISBN = Convert.ToInt32("978" + substring.Remove(9).Replace('X','0'));
-                        /*
-                         * Examples:
-                         *"/-/es/Colleen-Hoover/dp/1501110349/ref=sr_1_15?qid=1646327166&amp;refinements=p_n_feature_browse-bin%3A2656022011&amp;rnid=618072011&amp;s=books&amp;sr=1-15"
-                         *To ISBN --> 9781501110349
-                         *"/-/es/Gary-Chapman/dp/080241270X/ref=sr_1_16?qid=1646327166&amp;refinements=p_n_feature_browse-bin%3A2656022011&amp;rnid=618072011&amp;s=books&amp;sr=1-16"
-                         *To ISBN --> 9780802412700
-                         */
-                        break;
-                    }
-                    var mainName = link.CssSelect("span.a-size-medium"); //Book Name
-                    foreach (var link1 in mainName)
-                    {
-                        if(!link1.InnerHtml.Contains("class="))
+                        Book book = new Book();
+                        List<PriceDate> priceDates = new List<PriceDate>();
+                        book.PriceDates = priceDates;
+                        var mainURL = link.CssSelect("a.a-link-normal"); //Book URL and ISBN
+                        foreach (var link1 in mainURL)
                         {
-                            book.Name = link1.InnerHtml;
+                            var uri = link1.Attributes["href"].Value;
+                            book.Url = "www.amazon.com" + uri;
+                            var substring = uri.Substring(uri.IndexOf("dp/") + 3);
+                            book.ISBN = Convert.ToDouble("978" + substring.Remove(9).Replace('X','0'));
+                            /*
+                             * Examples:
+                             *"/-/es/Colleen-Hoover/dp/1501110349/ref=sr_1_15?qid=1646327166&amp;refinements=p_n_feature_browse-bin%3A2656022011&amp;rnid=618072011&amp;s=books&amp;sr=1-15"
+                             *To ISBN --> 9781501110349
+                             *"/-/es/Gary-Chapman/dp/080241270X/ref=sr_1_16?qid=1646327166&amp;refinements=p_n_feature_browse-bin%3A2656022011&amp;rnid=618072011&amp;s=books&amp;sr=1-16"
+                             *To ISBN --> 9780802412700
+                             */
+                            break;
                         }
-                    }
+                        var mainName = link.CssSelect("span.a-size-medium"); //Book Name
+                        foreach (var link1 in mainName)
+                        {
+                            if(!link1.InnerHtml.Contains("class="))
+                            {
+                                book.Name = link1.InnerHtml;
+                            }
+                        }
 
-                    var mainAuthor = link.CssSelect("a.a-size-base"); //Book Author
-                    foreach (var link1 in mainAuthor)
-                    {
-                        if(!link1.InnerHtml.Contains("class="))
+                        var mainAuthor = link.CssSelect("a.a-size-base"); //Book Author
+                        foreach (var link1 in mainAuthor)
                         {
-                            book.Author = link1.InnerHtml;
-                            break;
+                            if(!link1.InnerHtml.Contains("class="))
+                            {
+                                book.Author = link1.InnerHtml;
+                                break;
+                            }
                         }
-                    }
-                    var mainFormat = link.CssSelect("a.a-size-base.a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-bold"); //Book Format
-                    foreach (var link1 in mainFormat)
-                    {
-                        if (!link1.InnerHtml.Contains("class="))
+                        var mainFormat = link.CssSelect("a.a-size-base.a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-bold"); //Book Format
+                        foreach (var link1 in mainFormat)
                         {
-                            book.Format = link1.InnerHtml;
-                            break;
+                            if (!link1.InnerHtml.Contains("class="))
+                            {
+                                book.Format = link1.InnerHtml;
+                                break;
+                            }
                         }
-                    }
-                    var mainPrice = link.CssSelect("span.a-offscreen"); //Book Price
-                    foreach (var link1 in mainPrice)
-                    {
-                        if (!link1.InnerHtml.Contains("class="))
+                        var mainPrice = link.CssSelect("span.a-offscreen"); //Book Price
+                        foreach (var link1 in mainPrice)
                         {
-                            PriceDate priceDate = new PriceDate(Convert.ToDecimal(link1.InnerHtml.Replace("US$", "").Replace(',', '.')), "Amazon");
-                            book.PriceDates.Add(priceDate);
-                            break;
+                            if (!link1.InnerHtml.Contains("class="))
+                            {
+                                PriceDate priceDate = new PriceDate(Convert.ToDecimal(link1.InnerHtml.Replace("US$", "").Replace(',', '.'))/100, "Amazon");
+                                book.PriceDates.Add(priceDate);
+                                break;
+                            }
                         }
-                    }
 
-                    if (book.Name != null && book.Author != null && book.Format != null && book.Url != null)
-                    {
-                        bookList.Add(book);
+                        if (book.Name != null && book.Author != null && book.Format != null && book.Url != null)
+                        {
+                            bookList.Add(book);
+                        }
                     }
-                }
-                catch (Exception)
-                {
-                    throw;
+                    catch (Exception)
+                    {
+                        continue;
+                    }
                 }
             }
             return bookList;
