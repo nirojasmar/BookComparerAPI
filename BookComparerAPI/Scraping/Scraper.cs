@@ -70,6 +70,7 @@ namespace BookComparerAPI.Scraping
                                 break;
                             }
                         }
+                        
                         var mainFormat = link.CssSelect("a.a-size-base.a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-bold"); //Book Format
                         foreach (var link1 in mainFormat)
                         {
@@ -79,6 +80,7 @@ namespace BookComparerAPI.Scraping
                                 break;
                             }
                         }
+                        
                         var mainPrice = link.CssSelect("span.a-offscreen"); //Book Price
                         foreach (var link1 in mainPrice)
                         {
@@ -88,6 +90,14 @@ namespace BookComparerAPI.Scraping
                                 book.PriceDates.Add(priceDate);
                                 break;
                             }
+                        }
+
+                        if(book.ISBN != 0)
+                        {
+                            Book bookinfo = GetBLInfo(book.ISBN);
+                            book.Language = bookinfo.Language;
+                            book.Editor = bookinfo.Editor;
+                            book.PriceDates.Add(bookinfo.PriceDates[0]);
                         }
 
                         if (book.Name != null && book.Author != null && book.Format != null && book.Url != null)
@@ -102,6 +112,57 @@ namespace BookComparerAPI.Scraping
                 }
             }
             return bookList;
+        }
+
+        public static Book? GetBLInfo(double isbn)
+        {
+            try
+            {
+                var html = GetHtml("https://www.buscalibre.com.co/libros/search?q=" + isbn);
+                //Example URL:
+                //https://www.buscalibre.com.co/libros/search?q=9788416240999
+
+                Book book = new();
+                List<PriceDate> priceDates = new List<PriceDate>();
+                book.PriceDates = priceDates;
+
+                var mainPrice = html.CssSelect("span"); //Book Price
+                foreach (var link in mainPrice)
+                {
+                    if (!link.InnerHtml.Contains("class="))
+                    {
+                        PriceDate priceDate = new PriceDate(Convert.ToDecimal(link.InnerHtml.Replace("$ ", "").Replace(',', '.')) / 100, "BuscaLibre");
+                        book.PriceDates.Add(priceDate);
+                        break;
+                    }
+                }
+
+                var mainLanguage = html.CssSelect("div#metadata-idioma.box"); //Book Language
+                foreach (var link in mainLanguage)
+                {
+                    if (!link.InnerHtml.Contains("class="))
+                    {
+                        book.Language = link.InnerHtml;
+                        break;
+                    }
+                }
+
+                var mainEditor = html.CssSelect("a.color-primary.font-weight-medium.link-underline"); //Book Editor
+                foreach (var link in mainEditor)
+                {
+                    if (!link.InnerHtml.Contains("class="))
+                    {
+                        book.Editor = link.InnerHtml;
+                        break;
+                    }
+                }
+
+                return book;
+            }
+            catch (Exception)
+            {
+                return null;
+            }           
         }
     }
 }

@@ -6,9 +6,7 @@ namespace BookComparerAPI.Models
     {
         [Key]
         public double ISBN { get; set; }
-        [Required]
         public string? Name { get; set; }
-        [Required]
         public string? Author { get; set; }
         public string? Editor { get; set; }
         public string? Language { get; set; }
