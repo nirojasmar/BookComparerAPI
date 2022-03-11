@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BookComparerAPI.Scraping;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Data.SqlClient;
 
 namespace BookComparerAPI.Controllers
 {
