@@ -23,7 +23,7 @@ namespace BookComparerAPI.Scraping
         public static List<Book> GetAmazonBook()
         {
             var bookList = new List<Book>();
-            for (int i = 1; i <= 75; i++)
+            for (int i = 1; i <= 2; i++)
             {
                 var html = GetHtml("https://www.amazon.com/s?i=stripbooks&bbn=283155&rh=n%3A283155%2Cp_n_feature_browse-bin%3A2656022011&dc&page=" + i + "&language=es&qid=1646690447&rnid=618072011&ref=sr_pg_"+i);
                 // Example URL:
@@ -42,7 +42,7 @@ namespace BookComparerAPI.Scraping
                             var uri = link1.Attributes["href"].Value;
                             book.Url = "www.amazon.com" + uri;
                             var substring = uri.Substring(uri.IndexOf("dp/") + 3);
-                            book.Isbn = Convert.ToDouble("978" + substring.Remove(9).Replace('X','0'));
+                            book.Isbn = Convert.ToDouble("978" + substring.Remove(10).Replace('X','0'));
                             /*
                              * Examples:
                              *"/-/es/Colleen-Hoover/dp/1501110349/ref=sr_1_15?qid=1646327166&amp;refinements=p_n_feature_browse-bin%3A2656022011&amp;rnid=618072011&amp;s=books&amp;sr=1-15"
@@ -61,7 +61,7 @@ namespace BookComparerAPI.Scraping
                             }
                         }
 
-                        var mainAuthor = link.CssSelect("a.a-size-base"); //Book Author
+                        var mainAuthor = link.CssSelect("a.a-size-base"); //Book Author Case 1
                         foreach (var link1 in mainAuthor)
                         {
                             if(!link1.InnerHtml.Contains("class="))
@@ -70,7 +70,16 @@ namespace BookComparerAPI.Scraping
                                 break;
                             }
                         }
-                        
+
+                        mainAuthor = link.CssSelect("span.a-size-base");
+                        var link2 = mainAuthor.ElementAtOrDefault(1);
+                        if (link2 != null && !link2.InnerHtml.Contains("class=") && book.Author == "Pasta blanda") //Book Author Case 2
+                        {
+                                book.Author = link2.InnerHtml;
+                        }
+                       
+
+
                         var mainFormat = link.CssSelect("a.a-size-base.a-link-normal.s-underline-text.s-underline-link-text.s-link-style.a-text-bold"); //Book Format
                         foreach (var link1 in mainFormat)
                         {
@@ -92,12 +101,16 @@ namespace BookComparerAPI.Scraping
                             }
                         }
 
+                        book.Language = "Ingles";
+
                         if(book.Isbn != 0)
                         {
-                            Book bookinfo = GetBLInfo(book.Isbn);
-                            book.Language = bookinfo.Language;
-                            book.Editor = bookinfo.Editor;
-                            book.PriceDates.Add(bookinfo.PriceDates[0]);
+                            Book? bookinfo = GetBLInfo(book.Isbn);
+                            if(bookinfo?.Editor != null)
+                            {
+                                book.Editor = bookinfo.Editor;
+                                book.PriceDates.Add(bookinfo.PriceDates[0]);
+                            }
                         }
 
                         if (book.Name != null && book.Author != null && book.Format != null && book.Url != null)
@@ -122,47 +135,41 @@ namespace BookComparerAPI.Scraping
                 //Example URL:
                 //https://www.buscalibre.com.co/libros/search?q=9788416240999
 
-                Book book = new();
+                Book bookBl = new();
                 List<PriceDate> priceDates = new List<PriceDate>();
-                book.PriceDates = priceDates;
-
-                var mainPrice = html.CssSelect("span"); //Book Price
-                foreach (var link in mainPrice)
+                bookBl.PriceDates = priceDates;
+                var mainPrice = html.CssSelect("script"); //Book Price
+                var priceLink = mainPrice.ElementAtOrDefault(1);
+                if (priceLink.InnerHtml.Contains("ecomm_totalvalue_us"))
                 {
-                    if (!link.InnerHtml.Contains("class="))
-                    {
-                        PriceDate priceDate = new PriceDate(Convert.ToDecimal(link.InnerHtml.Replace("$ ", "").Replace(',', '.')) / 100, "BuscaLibre");
-                        book.PriceDates.Add(priceDate);
-                        break;
-                    }
+                    var substring = priceLink.InnerText.Substring(priceLink.InnerText.IndexOf("value_us' : '") + 13).Remove(4);
+                    PriceDate priceDate = new PriceDate(Convert.ToDecimal(substring) / 10, "BuscaLibre");
+                    bookBl.PriceDates.Add(priceDate);
                 }
 
-                var mainLanguage = html.CssSelect("div#metadata-idioma.box"); //Book Language
-                foreach (var link in mainLanguage)
-                {
-                    if (!link.InnerHtml.Contains("class="))
-                    {
-                        book.Language = link.InnerHtml;
-                        break;
-                    }
-                }
-
-                var mainEditor = html.CssSelect("a.color-primary.font-weight-medium.link-underline"); //Book Editor
+                var mainEditor = html.CssSelect("a.font-color-text.link-underline"); //Book Editor
                 foreach (var link in mainEditor)
                 {
                     if (!link.InnerHtml.Contains("class="))
                     {
-                        book.Editor = link.InnerHtml;
+                        if (link.InnerHtml.Contains("amp"))
+                        {
+                            bookBl.Editor = link.InnerHtml.Replace("amp;", "");
+                        }
+                        else
+                        {
+                            bookBl.Editor = link.InnerText;
+                        }
                         break;
                     }
                 }
 
-                return book;
+                return bookBl;
             }
             catch (Exception)
             {
                 return null;
-            }           
+            }
         }
     }
 }
