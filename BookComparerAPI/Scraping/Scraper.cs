@@ -23,7 +23,7 @@ namespace BookComparerAPI.Scraping
         public static List<Book> GetAmazonBook()
         {
             var bookList = new List<Book>();
-            for (int i = 1; i <= 2; i++)
+            for (int i = 1; i <= 75; i++)
             {
                 var html = GetHtml("https://www.amazon.com/s?i=stripbooks&bbn=283155&rh=n%3A283155%2Cp_n_feature_browse-bin%3A2656022011&dc&page=" + i + "&language=es&qid=1646690447&rnid=618072011&ref=sr_pg_"+i);
                 // Example URL:
