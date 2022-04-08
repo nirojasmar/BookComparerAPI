@@ -1,5 +1,6 @@
 ﻿using System;
 using BookComparerAPI.Models;
+using BookComparerAPI.Services;
 using HtmlAgilityPack;
 using ScrapySharp.Extensions;
 using ScrapySharp.Network;
@@ -22,6 +23,7 @@ namespace BookComparerAPI.Scraping
 
         public static List<Book> GetAmazonBook()
         {
+            BookDAO books = new BookDAO();
             var bookList = new List<Book>();
             for (int i = 1; i <= 75; i++)
             {
@@ -115,6 +117,16 @@ namespace BookComparerAPI.Scraping
 
                         if (book.Name != null && book.Author != null && book.Format != null && book.Url != null)
                         {
+                            /*
+                            if(books.GetBookByIsbn(book.Isbn) != null)
+                            {
+                                books.UpdatePrice(book);
+                            }
+                            else
+                            {
+                                books.InsertBook(book);
+                            }
+                            */
                             bookList.Add(book);
                         }
                     }
