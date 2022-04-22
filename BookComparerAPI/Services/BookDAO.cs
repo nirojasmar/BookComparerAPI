@@ -46,7 +46,7 @@ namespace BookComparerAPI.Services
 
         public Book GetBookByIsbn(double isbn)
         {
-            Book book = null;
+            Book? book = null;
 
             String sqlStatement = "SELECT * FROM dbo.Books WHERE Isbn = @isbn";
 
@@ -118,7 +118,39 @@ namespace BookComparerAPI.Services
 
         public List<Book> SearchBooks(string searchTerm)
         {
-            throw new NotImplementedException();
+            List<Book> foundBooks = new List<Book>();
+
+            String sqlStatement = "SELECT * FROM dbo.Books WHERE Name LIKE @Name";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(sqlStatement, connection);
+                command.Parameters.AddWithValue("@Name", '%' + searchTerm + '%');
+                try
+                {
+                    connection.Open();
+
+                    SqlDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        foundBooks.Add(new Book
+                        {
+                            Isbn = (double)reader[0],
+                            Name = (string)reader[1],
+                            Author = (string)reader[2],
+                            Editor = (string)reader[3],
+                            Language = (string)reader[4],
+                            Format = (string)reader[5],
+                            Url = (string)reader[6]
+                            //TODO: dbo.Prices Integration
+                        });
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+            return foundBooks;
         }
 
         public int UpdatePrice(Book book)
