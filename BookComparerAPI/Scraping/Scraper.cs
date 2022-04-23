@@ -4,6 +4,7 @@ using BookComparerAPI.Services;
 using HtmlAgilityPack;
 using ScrapySharp.Extensions;
 using ScrapySharp.Network;
+using Useragents;
 
 namespace BookComparerAPI.Scraping
 {
@@ -15,8 +16,9 @@ namespace BookComparerAPI.Scraping
         {
             _scrapBrowser.IgnoreCookies = true;
             _scrapBrowser.Timeout = TimeSpan.FromMinutes(15);
-            _scrapBrowser.Headers["User-Agent"] = "Mozilla/4.0 (Compatible; Windows NT 5.1; MSIE 6.0)" +
-                "(compatible, MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)";
+            /*_scrapBrowser.Headers["User-Agent"] = "Mozilla/4.0 (Compatible; Windows NT 5.1; MSIE 6.0)" +
+                "(compatible, MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)";*/
+            _scrapBrowser.Headers["User-Agent"] = Collection.GetRandomDesktop();
             WebPage _webPage = _scrapBrowser.NavigateToPage(new Uri(URL));
             return _webPage.Html;
         }
@@ -25,9 +27,9 @@ namespace BookComparerAPI.Scraping
         {
             BookDAO books = new BookDAO();
             var bookList = new List<Book>();
-            for (int i = 1; i <= 75; i++)
+            for (int i = 1; i <= 2; i++)
             {
-                var html = GetHtml("https://www.amazon.com/s?i=stripbooks&bbn=283155&rh=n%3A283155%2Cp_n_feature_browse-bin%3A2656022011&dc&page=" + i + "&language=es&qid=1646690447&rnid=618072011&ref=sr_pg_"+i);
+                var html = GetHtml("https://www.amazon.com/-/es/s?i=stripbooks&bbn=283155&rh=n%3A283155%2Cp_n_feature_browse-bin%3A2656022011&dc&page=" + i + "&language=es&qid=1650730501&rnid=618072011&ref=sr_pg_" + i);
                 // Example URL:
                 // https://www.amazon.com/s?i=stripbooks&bbn=283155&rh=n%3A283155%2Cp_n_feature_browse-bin%3A2656022011&dc&page=2&language=es&qid=1646710477&rnid=618072011&ref=sr_pg_2
                 var links = html.CssSelect("div.a-section.a-spacing-small");
@@ -117,7 +119,7 @@ namespace BookComparerAPI.Scraping
 
                         if (book.Name != null && book.Author != null && book.Format != null && book.Url != null)
                         {
-                            /*
+                            
                             if(books.GetBookByIsbn(book.Isbn) != null)
                             {
                                 books.UpdatePrice(book);
@@ -126,7 +128,7 @@ namespace BookComparerAPI.Scraping
                             {
                                 books.InsertBook(book);
                             }
-                            */
+                            
                             bookList.Add(book);
                         }
                     }
