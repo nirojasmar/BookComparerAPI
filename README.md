@@ -4,3 +4,5 @@ API that has the purpose of providing a lenghty book deals cathalog for the Book
 ## Changelog
 - 22/04/2022 : Change Visibility to Public
 - 8/04/2022 : Created new branch for database development & testing
+
+### This Program is for educational/demonstration purposes only.
