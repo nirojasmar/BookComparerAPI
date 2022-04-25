@@ -23,7 +23,7 @@ namespace BookComparerAPI.Scraping
             return _webPage.Html;
         }
 
-        public static List<Book> GetAmazonBook()
+        public static List<Book> GetAmazonBook() //TODO: Change Function into Void Type
         {
             BookDAO books = new BookDAO();
             var bookList = new List<Book>();
@@ -107,13 +107,19 @@ namespace BookComparerAPI.Scraping
 
                         book.Language = "Ingles";
 
-                        if(book.Isbn != 0)
+                        //TODO: Optimize so that when the book is on DB just the price is addded
+
+                        if (books.GetBookByIsbn(book.Isbn) != null)
+                        {
+                            books.UpdatePrice(book);
+                        }
+
+                        if (book.Isbn != 0)
                         {
                             Book? bookinfo = GetBLInfo(book.Isbn);
                             if(bookinfo?.Editor != null)
                             {
                                 book.Editor = bookinfo.Editor;
-                                book.PriceDates.Add(bookinfo.PriceDates[0]);
                             }
                             else
                             {
@@ -124,11 +130,7 @@ namespace BookComparerAPI.Scraping
                         if (book.Name != null && book.Author != null && book.Format != null && book.Url != null)
                         {
                             
-                            if(books.GetBookByIsbn(book.Isbn) != null)
-                            {
-                                books.UpdatePrice(book);
-                            }
-                            else
+                            if(books.GetBookByIsbn(book.Isbn) == null)
                             {
                                 books.InsertBook(book);
                                 books.UpdatePrice(book);
@@ -148,6 +150,7 @@ namespace BookComparerAPI.Scraping
 
         public static Book? GetBLInfo(double isbn)
         {
+            BookDAO bookDAO = new BookDAO();
             try
             {
                 var html = GetHtml("https://www.buscalibre.com.co/libros/search?q=" + isbn);
@@ -164,6 +167,7 @@ namespace BookComparerAPI.Scraping
                     var substring = priceLink.InnerText.Substring(priceLink.InnerText.IndexOf("value_us' : '") + 13).Remove(4);
                     PriceDate priceDate = new PriceDate(Convert.ToDecimal(substring) / 10, "BuscaLibre");
                     bookBl.PriceDates.Add(priceDate);
+                    bookDAO.UpdatePrice(bookBl);
                 }
 
                 var mainEditor = html.CssSelect("a.font-color-text.link-underline"); //Book Editor
