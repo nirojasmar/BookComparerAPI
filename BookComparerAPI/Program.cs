@@ -1,5 +1,7 @@
-var builder = WebApplication.CreateBuilder(args);
+using BookComparerAPI.Scraping;
 
+var builder = WebApplication.CreateBuilder(args);
+// var scraper = Scraper.GetAmazonBook(); WARNING: Not Proved, Just a thought (Probably Wrong)
 // Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
