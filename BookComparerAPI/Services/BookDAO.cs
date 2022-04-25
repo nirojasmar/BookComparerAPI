@@ -25,7 +25,7 @@ namespace BookComparerAPI.Services
                     {
                         foundBooks.Add(new Book
                         {
-                            Isbn = (double)reader[0],
+                            Isbn = (long)reader[0],
                             Name = (string)reader[1],
                             Author = (string)reader[2],
                             Editor = (string)reader[3],
@@ -64,7 +64,7 @@ namespace BookComparerAPI.Services
                     {
                         book = new Book
                         {
-                            Isbn = (double)reader[0],
+                            Isbn = (long)reader[0],
                             Name = (string)reader[1],
                             Author = (string)reader[2],
                             Editor = (string)reader[3],
@@ -100,8 +100,6 @@ namespace BookComparerAPI.Services
                 command.Parameters.Add("@Format", System.Data.SqlDbType.NChar).Value = book.Format;
                 command.Parameters.Add("@Url", System.Data.SqlDbType.NChar).Value = book.Url;
 
-                // TODO: dbo.Prices integration!
-
                 try
                 {
                     connection.Open();
@@ -134,7 +132,7 @@ namespace BookComparerAPI.Services
                     {
                         foundBooks.Add(new Book
                         {
-                            Isbn = (double)reader[0],
+                            Isbn = (long)reader[0],
                             Name = (string)reader[1],
                             Author = (string)reader[2],
                             Editor = (string)reader[3],
@@ -157,7 +155,7 @@ namespace BookComparerAPI.Services
         {
             int result = 0;
 
-            String sqlStatement = "INSERT INTO dbo.Price (BookID, Date, Value, Store) VALUES (@isbn, @Date, @Value, @Store)";
+            String sqlStatement = "INSERT INTO dbo.Prices (BookID, Date, Value, Store) VALUES (@isbn, @Date, @Value, @Store)";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {

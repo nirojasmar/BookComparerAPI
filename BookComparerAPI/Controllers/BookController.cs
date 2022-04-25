@@ -30,16 +30,16 @@ namespace BookComparerAPI.Controllers
 
         [HttpGet("~/getPriceList")]
         //GET: PriceList
-        public List<PriceDate> IndexPrice(int id)
+        public List<PriceDate> IndexPrice(long ISBN)
         {
             BookDAO book = new BookDAO();
-            return book.GetBookByIsbn(id).PriceDates;
+            return book.GetBookByIsbn(ISBN).PriceDates;
             //return Scraper.GetAmazonBook()[id].PriceDates;
         }
         
         [HttpGet("~/getSearchResult")]
         // GET: BookController/Search/12345
-        public Book Search(int ISBN)
+        public Book Search(long ISBN)
         {
             BookDAO book = new BookDAO();
             return book.GetBookByIsbn(ISBN); //TODO: Not yet tested: DB Pending for Confirmation

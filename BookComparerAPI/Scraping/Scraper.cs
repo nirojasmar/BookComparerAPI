@@ -46,7 +46,7 @@ namespace BookComparerAPI.Scraping
                             var uri = link1.Attributes["href"].Value;
                             book.Url = "www.amazon.com" + uri;
                             var substring = uri.Substring(uri.IndexOf("dp/") + 3);
-                            book.Isbn = Convert.ToDouble("978" + substring.Remove(10).Replace('X','0'));
+                            book.Isbn = Convert.ToInt64("978" + substring.Remove(10).Replace('X','0'));
                             /*
                              * Examples:
                              *"/-/es/Colleen-Hoover/dp/1501110349/ref=sr_1_15?qid=1646327166&amp;refinements=p_n_feature_browse-bin%3A2656022011&amp;rnid=618072011&amp;s=books&amp;sr=1-15"
@@ -115,6 +115,10 @@ namespace BookComparerAPI.Scraping
                                 book.Editor = bookinfo.Editor;
                                 book.PriceDates.Add(bookinfo.PriceDates[0]);
                             }
+                            else
+                            {
+                                book.Editor = "N/A";
+                            }
                         }
 
                         if (book.Name != null && book.Author != null && book.Format != null && book.Url != null)
@@ -127,6 +131,7 @@ namespace BookComparerAPI.Scraping
                             else
                             {
                                 books.InsertBook(book);
+                                books.UpdatePrice(book);
                             }
                             
                             bookList.Add(book);
