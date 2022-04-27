@@ -31,8 +31,8 @@ namespace BookComparerAPI.Services
                             Editor = (string)reader[3],
                             Language = (string)reader[4],
                             Format = (string)reader[5],
-                            Url = (string)reader[6]
-                            // TODO: dbo.Prices integration!
+                            Url = (string)reader[6],
+                            PriceDates = GetPriceDates((long)reader[0]) //NOT YET TESTED
                         });
                     }
                 }
@@ -70,8 +70,8 @@ namespace BookComparerAPI.Services
                             Editor = (string)reader[3],
                             Language = (string)reader[4],
                             Format = (string)reader[5],
-                            Url = (string)reader[6]
-                            // TODO: dbo.Prices integration!
+                            Url = (string)reader[6],
+                            PriceDates = GetPriceDates(isbn) //NOT YET TESTED
                         };
                     }
                 }
@@ -85,7 +85,32 @@ namespace BookComparerAPI.Services
 
         public List<PriceDate> GetPriceDates(long isbn)
         {
-            throw new NotImplementedException();
+            List<PriceDate> foundPrices = new List<PriceDate>();
+            string sqlStatement = "SELECT * FROM dbo.Prices WHERE BookID = @Isbn";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = new SqlCommand(sqlStatement, connection);
+                command.Parameters.Add("@Isbn", System.Data.SqlDbType.BigInt).Value = isbn;
+                try
+                {
+                    connection.Open();
+
+                    SqlDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        foundPrices.Add(new PriceDate(
+                            (DateTime)reader[0],
+                            (decimal)reader[1],
+                            (string)reader[2]
+                            ));
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+            return foundPrices;
         }
 
         public int InsertBook(Book book)
@@ -143,8 +168,8 @@ namespace BookComparerAPI.Services
                             Editor = (string)reader[3],
                             Language = (string)reader[4],
                             Format = (string)reader[5],
-                            Url = (string)reader[6]
-                            //TODO: dbo.Prices Integration
+                            Url = (string)reader[6],
+                            PriceDates =  GetPriceDates((long)reader[0]) //NOT YET TESTED
                         });
                     }
                 }

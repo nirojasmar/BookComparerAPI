@@ -18,5 +18,12 @@ namespace BookComparerAPI.Models
             this.Price = price;
             this.Store = store;
         }
+
+        public PriceDate(DateTime date, decimal price, string store)
+        {
+            this.Date=date;
+            this.Price = price;
+            this.Store = store;
+        }
     }
 }
