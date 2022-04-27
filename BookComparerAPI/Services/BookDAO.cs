@@ -44,7 +44,7 @@ namespace BookComparerAPI.Services
             return foundBooks;
         }
 
-        public Book GetBookByIsbn(double isbn)
+        public Book GetBookByIsbn(long isbn)
         {
             Book? book = null;
 
@@ -81,6 +81,11 @@ namespace BookComparerAPI.Services
                 }
             }
             return book;
+        }
+
+        public List<PriceDate> GetPriceDates(long isbn)
+        {
+            throw new NotImplementedException();
         }
 
         public int InsertBook(Book book)
