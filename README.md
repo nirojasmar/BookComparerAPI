@@ -1,5 +1,48 @@
 # BookComparerAPI
 API that has the purpose of providing a lenghty book deals cathalog for the BookComparer web-services. Supported by Swagger and ScrapySharp 3.0
+## GetBookList JSON
+
+```json
+[
+  {
+    "isbn": 9780062315005,
+    "name": "The Alchemist, 25th Anniversary: A Fable About Following Your Dream                                                                                                                                     ",
+    "author": "Paulo Coelho                                      ",
+    "editor": "N/A                                               ",
+    "language": "Ingles         ",
+    "format": "Pasta blanda                  ",
+    "url": "www.amazon.com/-/es/Paulo-Coelho/dp/0062315005/ref=sr_1_21?qid=1651178040&amp;refinements=p_n_feature_browse-bin%3A2656022011&amp;rnid=618072011&amp;s=books&amp;sr=1-21",
+    "priceDates": [
+      {
+        "date": "2022-04-28T15:34:50.767",
+        "price": 8.89,
+        "store": "Amazon                        "
+      }
+    ]
+  },
+  {
+    "isbn": 9780063078902,
+    "name": "Bridgerton [TV Tie-in] (Bridgertons Book 1)                                                                                                                                                             ",
+    "author": "Julia Quinn                                       ",
+    "editor": "N/A                                               ",
+    "language": "Ingles         ",
+    "format": "Pasta blanda                  ",
+    "url": "www.amazon.com/-/es/Julia-Quinn/dp/0063078902/ref=sr_1_31?qid=1650924490&amp;refinements=p_n_feature_browse-bin%3A2656022011&amp;rnid=618072011&amp;s=books&amp;sr=1-31",
+    "priceDates": [
+      {
+        "date": "2022-04-25T17:42:15.027",
+        "price": 10.99,
+        "store": "Amazon                        "
+      },
+      {
+        "date": "2022-04-25T22:18:52.7",
+        "price": 10.99,
+        "store": "Amazon                        "
+      }
+    ]
+  }
+]
+```
 
 ## ChangeLog
 - 28/04/2022 : API Completed :)
