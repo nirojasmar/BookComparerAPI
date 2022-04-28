@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using BookComparerAPI.Scraping;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Data.SqlClient;
+using BookComparerAPI.Services;
 
 namespace BookComparerAPI.Controllers
 {
@@ -22,23 +23,26 @@ namespace BookComparerAPI.Controllers
         // GET: BookController
         public List<Book> Index()
         {
-            return Scraper.GetAmazonBook();
+            BookDAO book = new BookDAO();
+            return book.GetAllBooks();
+            //return Scraper.GetAmazonBook();
         }
-
 
         [HttpGet("~/getPriceList")]
         //GET: PriceList
-        public List<PriceDate> IndexPrice(int id)
+        public List<PriceDate> IndexPrice(long ISBN)
         {
-            return Scraper.GetAmazonBook()[id].PriceDates;
+            BookDAO book = new BookDAO();
+            return book.GetBookByIsbn(ISBN).PriceDates;
+            //return Scraper.GetAmazonBook()[id].PriceDates;
         }
-
-        // GET: BookController/Search/12345
-        /*
+        
         [HttpGet("~/getSearchResult")]
-        public Book Search(int ISBN)
+        // GET: BookController/Search/12345
+        public Book Search(long ISBN)
         {
-            return null; //TODO: Not yet implemented: DB Pending
-        }*/
+            BookDAO book = new BookDAO();
+            return book.GetBookByIsbn(ISBN); //TODO: Not yet tested: DB Pending for Confirmation
+        }
     }
 }

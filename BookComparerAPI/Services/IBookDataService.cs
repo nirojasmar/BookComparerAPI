@@ -6,6 +6,9 @@ namespace BookComparerAPI.Services
     {
         List<Book> GetAllBooks();
         List<Book> SearchBooks(string searchTerm);
-        Book GetBookByIsbn(double isbn);
+        Book GetBookByIsbn(long isbn);
+        int InsertBook(Book book);
+        int UpdatePrice(Book book);
+        List<PriceDate> GetPriceDates(long isbn);
     }
 }

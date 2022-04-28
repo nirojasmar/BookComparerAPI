@@ -1,8 +1,10 @@
 ﻿using System;
 using BookComparerAPI.Models;
+using BookComparerAPI.Services;
 using HtmlAgilityPack;
 using ScrapySharp.Extensions;
 using ScrapySharp.Network;
+using Useragents;
 
 namespace BookComparerAPI.Scraping
 {
@@ -14,18 +16,17 @@ namespace BookComparerAPI.Scraping
         {
             _scrapBrowser.IgnoreCookies = true;
             _scrapBrowser.Timeout = TimeSpan.FromMinutes(15);
-            _scrapBrowser.Headers["User-Agent"] = "Mozilla/4.0 (Compatible; Windows NT 5.1; MSIE 6.0)" +
-                "(compatible, MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)";
+            _scrapBrowser.Headers["User-Agent"] = Collection.GetRandomDesktop();
             WebPage _webPage = _scrapBrowser.NavigateToPage(new Uri(URL));
             return _webPage.Html;
         }
 
-        public static List<Book> GetAmazonBook()
+        public static void GetAmazonBook()
         {
-            var bookList = new List<Book>();
-            for (int i = 1; i <= 75; i++)
+            BookDAO books = new BookDAO();
+            for (int i = 1; i <= 70; i++)
             {
-                var html = GetHtml("https://www.amazon.com/s?i=stripbooks&bbn=283155&rh=n%3A283155%2Cp_n_feature_browse-bin%3A2656022011&dc&page=" + i + "&language=es&qid=1646690447&rnid=618072011&ref=sr_pg_"+i);
+                var html = GetHtml("https://www.amazon.com/-/es/s?i=stripbooks&bbn=283155&rh=n%3A283155%2Cp_n_feature_browse-bin%3A2656022011&dc&page=" + i + "&language=es&qid=1650730501&rnid=618072011&ref=sr_pg_" + i);
                 // Example URL:
                 // https://www.amazon.com/s?i=stripbooks&bbn=283155&rh=n%3A283155%2Cp_n_feature_browse-bin%3A2656022011&dc&page=2&language=es&qid=1646710477&rnid=618072011&ref=sr_pg_2
                 var links = html.CssSelect("div.a-section.a-spacing-small");
@@ -42,7 +43,7 @@ namespace BookComparerAPI.Scraping
                             var uri = link1.Attributes["href"].Value;
                             book.Url = "www.amazon.com" + uri;
                             var substring = uri.Substring(uri.IndexOf("dp/") + 3);
-                            book.Isbn = Convert.ToDouble("978" + substring.Remove(10).Replace('X','0'));
+                            book.Isbn = Convert.ToInt64("978" + substring.Remove(10).Replace('X','0'));
                             /*
                              * Examples:
                              *"/-/es/Colleen-Hoover/dp/1501110349/ref=sr_1_15?qid=1646327166&amp;refinements=p_n_feature_browse-bin%3A2656022011&amp;rnid=618072011&amp;s=books&amp;sr=1-15"
@@ -103,32 +104,46 @@ namespace BookComparerAPI.Scraping
 
                         book.Language = "Ingles";
 
-                        if(book.Isbn != 0)
+                        //TODO: Optimize so that when the book is on DB just the price is addded
+
+                        if (books.GetBookByIsbn(book.Isbn) != null)
+                        {
+                            books.UpdatePrice(book);
+                        }
+
+                        if (book.Isbn != 0)
                         {
                             Book? bookinfo = GetBLInfo(book.Isbn);
                             if(bookinfo?.Editor != null)
                             {
                                 book.Editor = bookinfo.Editor;
-                                book.PriceDates.Add(bookinfo.PriceDates[0]);
+                            }
+                            else
+                            {
+                                book.Editor = "N/A";
                             }
                         }
 
                         if (book.Name != null && book.Author != null && book.Format != null && book.Url != null)
-                        {
-                            bookList.Add(book);
+                        {    
+                            if(books.GetBookByIsbn(book.Isbn) == null)
+                            {
+                                books.InsertBook(book);
+                                books.UpdatePrice(book);
+                            }       
                         }
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        continue;
+                        Console.WriteLine(e.Message);
                     }
                 }
             }
-            return bookList;
         }
 
-        public static Book? GetBLInfo(double isbn)
+        public static Book? GetBLInfo(long isbn)
         {
+            BookDAO bookDAO = new BookDAO();
             try
             {
                 var html = GetHtml("https://www.buscalibre.com.co/libros/search?q=" + isbn);
@@ -136,6 +151,7 @@ namespace BookComparerAPI.Scraping
                 //https://www.buscalibre.com.co/libros/search?q=9788416240999
 
                 Book bookBl = new();
+                bookBl.Isbn = isbn;
                 List<PriceDate> priceDates = new List<PriceDate>();
                 bookBl.PriceDates = priceDates;
                 var mainPrice = html.CssSelect("script"); //Book Price
@@ -145,6 +161,7 @@ namespace BookComparerAPI.Scraping
                     var substring = priceLink.InnerText.Substring(priceLink.InnerText.IndexOf("value_us' : '") + 13).Remove(4);
                     PriceDate priceDate = new PriceDate(Convert.ToDecimal(substring) / 10, "BuscaLibre");
                     bookBl.PriceDates.Add(priceDate);
+                    bookDAO.UpdatePrice(bookBl);
                 }
 
                 var mainEditor = html.CssSelect("a.font-color-text.link-underline"); //Book Editor
