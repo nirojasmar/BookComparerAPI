@@ -27,7 +27,7 @@ namespace BookComparerAPI.Scraping
         {
             BookDAO books = new BookDAO();
             var bookList = new List<Book>();
-            for (int i = 1; i <= 2; i++)
+            for (int i = 1; i <= 70; i++)
             {
                 var html = GetHtml("https://www.amazon.com/-/es/s?i=stripbooks&bbn=283155&rh=n%3A283155%2Cp_n_feature_browse-bin%3A2656022011&dc&page=" + i + "&language=es&qid=1650730501&rnid=618072011&ref=sr_pg_" + i);
                 // Example URL:
@@ -139,16 +139,16 @@ namespace BookComparerAPI.Scraping
                             bookList.Add(book);
                         }
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        continue;
+                        Console.WriteLine(e.Message);
                     }
                 }
             }
             return bookList;
         }
 
-        public static Book? GetBLInfo(double isbn)
+        public static Book? GetBLInfo(long isbn)
         {
             BookDAO bookDAO = new BookDAO();
             try
@@ -158,6 +158,7 @@ namespace BookComparerAPI.Scraping
                 //https://www.buscalibre.com.co/libros/search?q=9788416240999
 
                 Book bookBl = new();
+                bookBl.Isbn = isbn;
                 List<PriceDate> priceDates = new List<PriceDate>();
                 bookBl.PriceDates = priceDates;
                 var mainPrice = html.CssSelect("script"); //Book Price

@@ -99,9 +99,9 @@ namespace BookComparerAPI.Services
                     while (reader.Read())
                     {
                         foundPrices.Add(new PriceDate(
-                            (DateTime)reader[0],
-                            (decimal)reader[1],
-                            (string)reader[2]
+                            (DateTime)reader[2],
+                            (decimal)reader[3],
+                            (string)reader[4]
                             ));
                     }
                 }
