@@ -23,10 +23,9 @@ namespace BookComparerAPI.Scraping
             return _webPage.Html;
         }
 
-        public static List<Book> GetAmazonBook() //TODO: Change Function into Void Type
+        public static void GetAmazonBook()
         {
             BookDAO books = new BookDAO();
-            var bookList = new List<Book>();
             for (int i = 1; i <= 70; i++)
             {
                 var html = GetHtml("https://www.amazon.com/-/es/s?i=stripbooks&bbn=283155&rh=n%3A283155%2Cp_n_feature_browse-bin%3A2656022011&dc&page=" + i + "&language=es&qid=1650730501&rnid=618072011&ref=sr_pg_" + i);
@@ -128,15 +127,12 @@ namespace BookComparerAPI.Scraping
                         }
 
                         if (book.Name != null && book.Author != null && book.Format != null && book.Url != null)
-                        {
-                            
+                        {    
                             if(books.GetBookByIsbn(book.Isbn) == null)
                             {
                                 books.InsertBook(book);
                                 books.UpdatePrice(book);
-                            }
-                            
-                            bookList.Add(book);
+                            }       
                         }
                     }
                     catch (Exception e)
@@ -145,7 +141,6 @@ namespace BookComparerAPI.Scraping
                     }
                 }
             }
-            return bookList;
         }
 
         public static Book? GetBLInfo(long isbn)
