@@ -46,7 +46,7 @@ namespace BookComparerAPI.Services
 
         public Book GetBookByIsbn(long isbn)
         {
-            Book? book = null;
+            Book? book = new();
 
             String sqlStatement = "SELECT * FROM dbo.Books WHERE Isbn = @isbn";
 
