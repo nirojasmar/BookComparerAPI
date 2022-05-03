@@ -45,6 +45,7 @@ API that has the purpose of providing a lenghty book deals cathalog for the Book
 ```
 
 ## ChangeLog
+- 01/05/2022 : Warning Fixes
 - 28/04/2022 : API Completed :)
 - 27/04/2022 : DAO now recovers PriceDates for API Operations (Experimental)
 - 25/04/2022 : DAO Fixed Types and use of Scraper, BL and Amazon Prices are properly added to the DB
