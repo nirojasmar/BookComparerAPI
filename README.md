@@ -2,6 +2,7 @@
 API that has the purpose of providing a lenghty book deals cathalog for the BookComparer web-services. Supported by Swagger and ScrapySharp 3.0
 
 ## ChangeLog
+- 03/05/2022 : Began transition to Postgres using EFCore and deployment with Heroku
 - 01/05/2022 : Warning Fixes
 - 28/04/2022 : API Completed :)
 - 27/04/2022 : DAO now recovers PriceDates for API Operations (Experimental)
