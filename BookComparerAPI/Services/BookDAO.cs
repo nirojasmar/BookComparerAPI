@@ -6,9 +6,21 @@ namespace BookComparerAPI.Services
 {
     public class BookDAO : IBookDataService
     {
-        string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=BookDealsDB;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        /*UserSecrets : IDataProtector; TODO:
+        In addition to use Azure App Service or docker containers, you can also securely store your app secrets in production using IDataProtector:
+        App secrets are entered with running a -config switch of the application, for example: dotnet helloworld -config; In Program.Main, detects this switch to let user to enter the secrets and store in a separate .json file, encrypted:
+         */
+        private readonly IConfiguration _config;
+
+        public BookDAO(IConfiguration config)
+        {
+            _config = config;
+        }  
+
         public List<Book> GetAllBooks()
         {
+            var connectionString = _config["Data:ConnectionString"];
+
             List<Book> foundBooks = new List<Book>();
 
             String sqlStatement = "SELECT * FROM dbo.Books";
@@ -46,6 +58,8 @@ namespace BookComparerAPI.Services
 
         public Book GetBookByIsbn(long isbn)
         {
+            var connectionString = _config["Data:ConnectionString"];
+
             Book? book = new();
 
             String sqlStatement = "SELECT * FROM dbo.Books WHERE Isbn = @isbn";
@@ -85,6 +99,7 @@ namespace BookComparerAPI.Services
 
         public List<PriceDate> GetPriceDates(long isbn)
         {
+            var connectionString = _config["Data:ConnectionString"];
             List<PriceDate> foundPrices = new List<PriceDate>();
             string sqlStatement = "SELECT * FROM dbo.Prices WHERE BookID = @Isbn";
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -115,6 +130,8 @@ namespace BookComparerAPI.Services
 
         public int InsertBook(Book book)
         {
+            var connectionString = _config["Data:ConnectionString"];
+
             int result = 0;
 
             String sqlStatement = "INSERT INTO dbo.Books (Isbn, Name, Author, Editor, Language, Format, Url) VALUES (@Isbn, @Name, @Author, @Editor, @Language, @Format, @Url)";
@@ -146,6 +163,8 @@ namespace BookComparerAPI.Services
 
         public List<Book> SearchBooks(string searchTerm)
         {
+            var connectionString = _config["Data:ConnectionString"];
+
             List<Book> foundBooks = new List<Book>();
 
             String sqlStatement = "SELECT * FROM dbo.Books WHERE Name LIKE @Name";
@@ -183,6 +202,8 @@ namespace BookComparerAPI.Services
 
         public int UpdatePrice(Book book)
         {
+            var connectionString = _config["Data:ConnectionString"];
+
             int result = 0;
 
             String sqlStatement = "INSERT INTO dbo.Prices (BookID, Date, Value, Store) VALUES (@isbn, @Date, @Value, @Store)";
